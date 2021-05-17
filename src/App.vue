@@ -14,28 +14,33 @@ export default {
     Logo
   },
   beforeMount(){
-    this.$store.state.isHost = !this.$route.params.id;
-    this.$store.state.gameId = this.$route.params.id;
-
     try {
       this.$store.state.user = JSON.parse(localStorage.getItem('user')) || this.$store.state.user;
-      this.$store.state.user.role=0;
     }catch (e) {
-      localStorage.removeItem('user')
-    }
-
-    if(localStorage.getItem(this.$store.state.gameId)){
-      this.$store.state.isHost = true;
-      this.$store.state.user.role=1;
+      localStorage.removeItem('user');
+      localStorage.removeItem('friends');
+      localStorage.removeItem('history');
     }
 
 
-    if(!this.$store.state.user.id){
-      this.$router.push({ name: 'Login', params: { id:  this.$route.params.id }}).catch(err => {});
+
+    if(this.$store.state.user.id){
+      try {
+        this.$store.state.friends = JSON.parse(localStorage.getItem('friends')) || this.$store.state.friends;
+      }catch (e) {
+        localStorage.removeItem('friends')
+      }
+
+      try {
+        this.$store.state.history = JSON.parse(localStorage.getItem('history')) || this.$store.state.friends;
+      }catch (e) {
+        localStorage.removeItem('history')
+      }
+
+      this.$router.push({ name: 'Home'}).catch(err => {});
+    }else{
+      this.$router.push({ name: 'Login'}).catch(err => {});
     }
-    // else{
-    //   this.$router.push({ name: 'Home', params: { id:  this.$route.params.id }}).catch(err => {});
-    // }
   }
 }
 </script>
@@ -44,7 +49,7 @@ export default {
 body{
   overflow: hidden;
   max-width: 100vw;
-  max-height: 100vh;
+  height: 100vh;
   margin: 0;
   padding: 0;
 }
@@ -61,7 +66,7 @@ body{
   justify-content: center;
   align-items: center;
   min-height: calc(100vh - 40px);
-  max-height: calc(100vh - 40px);
+  height: calc(100% - 60px);
 }
 
 label{

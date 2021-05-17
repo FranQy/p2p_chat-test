@@ -1,5 +1,5 @@
 <template>
-  <div class="login">
+  <form class="login" @submit.prevent="login">
     <div class="input-wrapper" v-bind:class="{ 'error': usernameError }">
       <label for="name">
         User name:
@@ -10,10 +10,10 @@
       </div>
     </div>
 
-    <button type="button" class="submit-btn" v-on:click="login">
-      Create game
+    <button type="button" class="submit-btn" @click.prevent="login">
+      Join
     </button>
-  </div>
+  </form>
 </template>
 
 <script>
@@ -32,31 +32,22 @@ export default {
   methods:{
     login(){
       if(this.username){
-        this.$store.state.isHost =  this.$store.state.isHost || !this.$route.params.id;
-
         p2p.init().then(userId=>{
           this.$store.commit({
-            type: 'saveLoggedUser',
+            type: 'saveCurrentUser',
             user: {
               username: this.username,
-              role: this.$store.state.isHost ? 1 : 0,
               id: userId
             }
           });
 
-          this.$router.push({ name: 'Home', params: { id:  this.$route.params.id }});
+          this.$router.push({ name: 'Home'});
         });
 
       }else{
         this.usernameError = "Username can not be empty!";
       }
     }
-  },
-  beforeMount() {
-    this.$store.commit({
-      type: 'saveLoggedUser',
-      user: undefined
-    });
   }
 }
 </script>

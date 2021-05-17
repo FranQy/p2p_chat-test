@@ -1,75 +1,23 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-Vue.use(Vuex)
+Vue.use(Vuex);
 
 export default new Vuex.Store({
     state: {
         isHost: false,
-        gameId: undefined,
-        card:undefined,
+        chatId: undefined,
         user: {
             id: undefined,
             username: undefined,
-            role: 0
         },
-        users: [],
-        cards:[
-            {
-                value: 0,
-                text: "0"
-            },
-            {
-                value: 0.5,
-                text: "1/2"
-            },
-            {
-                value: 1,
-                text: "1"
-            },
-            {
-                value: 2,
-                text: "2"
-            },
-            {
-                value: 3,
-                text: "3"
-            },
-            {
-                value: 5,
-                text: "5"
-            },
-            {
-                value: 8,
-                text: "8"
-            },
-            {
-                value: 13,
-                text: "13"
-            },
-            {
-                value: 20,
-                text: "20"
-            },
-            {
-                value: 40,
-                text: "40"
-            },
-            {
-                value: 100,
-                text: "100"
-            },
-            {
-                value: null,
-                text: "?"
-            },
-        ],
-        selectedCards:[],
-        areCardsVisible:false
+        friends: [],
+        history: {},
+        _state: true,
     },
 
     mutations: {
-        saveLoggedUser(state, payload) {
+        saveCurrentUser(state, payload) {
             if (state && payload) {
                 state.user = payload.user;
                 if (payload.user) {
@@ -79,15 +27,33 @@ export default new Vuex.Store({
                 }
             }
         },
-        saveHostGameId(state, payload) {
-            if (state && payload) {
-                state.gameId = payload.gameId;
 
-                localStorage.setItem(payload.gameId, payload.gameId);
+        addMessage(state, payload) {
+            if (state && payload) {
+                if (!state.history[payload.chatId]) {
+                    state.history[payload.chatId] = [];
+                }
+                state.history[payload.chatId].push(payload.message);
+                localStorage.setItem('history', JSON.stringify(state.history));
+                state._state = !state._state
+            }
+        },
+
+        addFriend(state, payload) {
+            if (state && payload) {
+                if (payload.friend) {
+                    state.friends = state.friends.filter(user => user.id !== payload.friend.id);
+                    if (payload.friend.id === state.user.id) {
+                        return
+                    }
+
+                    state.friends.push(payload.friend);
+
+                    state.history[payload.friend.id] = state.history[payload.friend.id] || [];
+                    localStorage.setItem('friends', JSON.stringify(state.friends));
+                    localStorage.setItem('history', JSON.stringify(state.history));
+                }
             }
         },
     },
-    actions: {},
-    modules: {},
-
 })
